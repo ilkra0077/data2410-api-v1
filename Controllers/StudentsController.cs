@@ -106,7 +106,7 @@ public class StudentsController(IConfiguration config) : ControllerBase
         using var conn = new SqlConnection(_connectionString);
         await conn.OpenAsync();
 
-        // Step 1: Read all students from the database
+        // Read all students from the database
         using var selectCmd = new SqlCommand("SELECT Id, Name, Course, Marks, Grade FROM Students", conn);
         using var reader = await selectCmd.ExecuteReaderAsync();
         while (await reader.ReadAsync())
@@ -122,7 +122,7 @@ public class StudentsController(IConfiguration config) : ControllerBase
         }
         reader.Close();
 
-        // Step 2 & 3: Calculate grade for each student and update the Grade column in the database
+        // Calculate grade for each student and update the Grade column in the database
         foreach (var student in studentsWithGrade)
         {
             student.Grade = GetGrade(student.Marks);
@@ -134,7 +134,7 @@ public class StudentsController(IConfiguration config) : ControllerBase
             await updateCmd.ExecuteNonQueryAsync();
         }
 
-        // Step 4: Return the list of all students with their calculated grades
+        // Return the list of all students with their calculated grades
         return studentsWithGrade;
     }
 
@@ -142,10 +142,13 @@ public class StudentsController(IConfiguration config) : ControllerBase
     //Code for report generation logic 
     public async Task<IActionResult> Report()
     {
+        // Write code for the report generation logic.
         var reports = new List<CourseReport>();
         using var conn = new SqlConnection(_connectionString);
         await conn.OpenAsync();
 
+        // Select the database and group students by course.
+        // For each course, calculate total students, average marks,and count of each grade (A, B, C, D) using GROUP BY with aggregate functions.
         const string sql = """
             SELECT
                 Course,
@@ -179,6 +182,7 @@ public class StudentsController(IConfiguration config) : ControllerBase
             });
         }
 
+        // Return the course-wise report
         return Ok(reports);
     }
 
